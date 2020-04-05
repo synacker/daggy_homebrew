@@ -10,11 +10,18 @@ class Daggy < Formula
   depends_on "yaml-cpp"
   depends_on "libssh2"
 
+  patch do
+    url "https://raw.githubusercontent.com/synacker/daggy_homebrew/master/mustache.patch"
+    sha256 "8ccee97c0e38c385b934e079371da42de8d2997488186f82969e1965b8b86ddc"
+  end
+
   def install
-    # ENV.deparallelize  # if your formula fails when building in parallel
-    # Remove unrecognized options if warned by configure
-    system "cmake", "src", "-DVERSION=2.0.0"
-    system "cmake", "--build", "."
+    system "wget", "https://raw.githubusercontent.com/kainjow/Mustache/master/mustache.hpp", "-O", "src/Daggy/mustache.hpp"
+    system "mkdir", "build"
+    Dir.chdir('build')
+    system "cmake", "-D", "VERSION=2.0.0", "-D", "CMAKE_INSTALL_PREFIX:PATH=#{prefix}", "-D", "CMAKE_BUILD_TYPE=Release", "../src"
+    system "make", "all"
+    system "make", "install"
   end
 
   test do
